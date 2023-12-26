@@ -1,5 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const YourDistance = ({ user, returnTokens }) => {
     return (
@@ -21,13 +23,11 @@ const mapStateToProps = (state) => {
 
 export default connect(mapStateToProps)(YourDistance);
 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-
 const ClubActivities = () => {
   const [activities, setActivities] = useState([]);
   const [error, setError] = useState(null);
   const clubId = 1200758; // Club ID
+  const accessToken = accessToken; // access token
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -51,7 +51,4 @@ const ClubActivities = () => {
 
   // ... use the activities data to render your component
 
-  return (
-    // ... your component's JSX
-  );
 };
