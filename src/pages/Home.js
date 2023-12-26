@@ -9,9 +9,27 @@ const handleLogin = () => {
 
 const Home = () => {
     return (
-        <div>
-            <h1>Home</h1>
-            <button onClick={handleLogin}>Connect with Strava</button>
+        <div className="homepage">
+            <header className="home-header">
+                <h1>Home</h1>
+                <p>Join Product Solutions as we embark on bi-weekly active challenges!</p>
+                <button onClick={handleLogin}>Connect with Strava</button>
+            </header>
+
+            <main className="home-content">
+                <div className="hero-section">
+                    <img src="path/to/runner-group.jpg" alt="group of people running together" className="hero-image" />
+                </div>
+                <section className="how-it-works-section">
+          <h2>How It Works</h2>
+          <ol>
+            <li>Sign up with Strava and connect your fitness tracker.</li>
+            <li>Track your walks and runs throughout the challenge period.</li>
+            <li>Each challenge may be a little different! Earn points for steps, miles, or even active minutes.</li>
+            <li>Climb the leaderboard and compete for the greatest prize of all time - public affirmation!</li>
+          </ol>
+        </section>
+            </main>
         </div>
     );
 };
