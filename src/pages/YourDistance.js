@@ -1,54 +1,41 @@
-import React from "react";
-import { connect } from "react-redux";
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { setUser } from '../actions';
 
-const YourDistance = ({ user, returnTokens }) => {
-    return (
-        <div>
-            <h1>Hi, {returnTokens.athlete.firstname}!</h1>
-            <h2>{user.data.all_run_totals.distance}</h2>
-            <h2>{user.data.all_ride_totals.distance}</h2>
-            <h2>{user.data.all_swim_totals.distance}</h2>
-        </div>
-    );
-};
+const ClubMiles = ({ clubId }) => {
+  const [totalMiles, setTotalMiles] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
-const mapStateToProps = (state) => {
-    return {
-        user: state.user,
-        returnTokens: state.returnTokens,
-    };
-};
-
-export default connect(mapStateToProps)(YourDistance);
-
-const ClubActivities = () => {
-  const [activities, setActivities] = useState([]);
-  const [error, setError] = useState(null);
-  const clubId = 1200758; // Club ID
-  const accessToken = accessToken; // access token
+  const getCurrentWeekDates = () => {
+    const now = new Date();
+    const day = now.getDay();
+    const sunday = new Date(now.setDate(now.getDate() - day));
+    const saturday = new Date(sunday.setDate(sunday.getDate() + 6));
+    return { start: sunday, end: saturday };
+  };
 
   useEffect(() => {
-    const fetchActivities = async () => {
-      try {
-        const response = await axios.get(`https://www.strava.com/api/v3/clubs/${clubId}/activities`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-          params: { // Optional query parameters
-            after: '2023-12-20', // Filter activities after this date
-            before: '2023-12-26', // Filter activities before this date
-          },
-        });
-
-        setActivities(response.data);
-      } catch (error) {
-        setError(error);
-      }
-    };
-
-    fetchActivities();
+    const { start, end } = getCurrentWeekDates();
+    setIsLoading(true);
+    fetch(`https://www.strava.com/api/v3/clubs/${clubId}/activities?after=${start.toISOString()}&before=${end.toISOString()}`)
+      .then(response => response.json())
+      .then(data => {
+        const miles = data.activities.reduce((acc, activity) => acc + activity.distance, 0);
+        setTotalMiles(miles);
+        setIsLoading(false);
+      })
+      .catch(error => console.error(error));
   }, []);
 
-  // ... use the activities data to render your component
+  if (isLoading) {
+    return <p>Loading club mileage...</p>;
+  }
 
+  return (
+    <div>
+      <h1>Club Total Miles this Week: {totalMiles}</h1>
+      {/* MemberList component and other content as needed */}
+    </div>
+  );
 };
+
+export default ClubMiles;
