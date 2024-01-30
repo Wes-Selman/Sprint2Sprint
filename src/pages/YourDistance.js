@@ -1,41 +1,58 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { setUser } from '../actions';
 
-const ClubMiles = ({ clubId }) => {
-  const [totalMiles, setTotalMiles] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const getCurrentWeekDates = () => {
-    const now = new Date();
-    const day = now.getDay();
-    const sunday = new Date(now.setDate(now.getDate() - day));
-    const saturday = new Date(sunday.setDate(sunday.getDate() + 6));
-    return { start: sunday, end: saturday };
-  };
+const ClubActivities = () => {
+  const [activities, setActivities] = useState([]);
+  const [error, setError] = useState(null);
+  const clubId = 1200758; // Replace with your actual club ID
+  const accessToken = setUser.accessToken; // Replace with your Strava access token
 
   useEffect(() => {
-    const { start, end } = getCurrentWeekDates();
-    setIsLoading(true);
-    fetch(`https://www.strava.com/api/v3/clubs/${clubId}/activities?after=${start.toISOString()}&before=${end.toISOString()}`)
-      .then(response => response.json())
-      .then(data => {
-        const miles = data.activities.reduce((acc, activity) => acc + activity.distance, 0);
-        setTotalMiles(miles);
-        setIsLoading(false);
-      })
-      .catch(error => console.error(error));
+    const fetchActivities = async () => {
+      try {
+        const response = await axios.get(`https://www.strava.com/api/v3/clubs/1200758/activities`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          params: { // Optional query parameters
+            after: '2023-12-20', // Filter activities after this date
+            before: '2023-12-26', // Filter activities before this date
+          },
+        });
+
+        setActivities(response.data);
+      } catch (error) {
+        setError(error);
+      }
+    };
+
+    fetchActivities();
   }, []);
-
-  if (isLoading) {
-    return <p>Loading club mileage...</p>;
-  }
-
-  return (
-    <div>
-      <h1>Club Total Miles this Week: {totalMiles}</h1>
-      {/* MemberList component and other content as needed */}
-    </div>
-  );
-};
-
-export default ClubMiles;
+  const ClubActivities = () => {
+    const [activities, setActivities] = useState([]);
+    const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(false); // Add loading state
+  
+    return (
+      <div>
+        {isLoading && <p>Loading activities for clubId...</p>}
+        {error && <p>Error fetching activities: {error.message}</p>}
+        {!error && activities.length > 0 && (
+          <ul>
+            {activities.map((activity) => (
+              <li key={activity.id}>
+                {/* Render activity details here */}
+                <h3>{activity.name}</h3>
+                <p>Type: {activity.type}</p>
+                <p>Distance: {activity.distance} km</p>
+                <p>Date: {new Date(activity.start_date_local).toLocaleDateString()}</p>
+                {/* ...more details as needed */}
+              </li>
+            ))}
+          </ul>
+        )}
+        {!error && activities.length === 0 && <p>No activities found.</p>}
+      </div>
+    );
+  };
+}
+export default ClubActivities;
