@@ -33,7 +33,7 @@ class StravaRedirect extends React.Component {
                 this.props.setUserActivities(user);
 
                 // Once complete, go to display page
-                history.push("/yourdistance");
+                history.push("/YourDistance");
             } catch (error) {
                 history.push("/");
             }
