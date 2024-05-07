@@ -25,6 +25,7 @@ const YourDistance = ({ user, returnTokens }) => {
       <li>You've swam {user.data.all_swim_totals.distance} miles!</li>
       <button onClick={handleLogin}>Club Leaderboard</button>
     </ol>
+    
   </section>
       </main>
   </div>
